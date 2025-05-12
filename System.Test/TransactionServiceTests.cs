@@ -25,7 +25,7 @@ namespace System.Test
             var ex = Assert.Throws<InvalidOperationException>(
                 () => _transferService.Transfer(accountNumber, accountNumber, 100));
 
-            Assert.Equal("Cannot transfer to the same account.", ex.Message);
+            Assert.Equal("Cannot transfer to the same account.", ex.Message); 
         }
     }
 }
