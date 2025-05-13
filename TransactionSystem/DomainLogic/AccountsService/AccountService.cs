@@ -19,14 +19,17 @@ namespace TransactionSystem.DomainLogic.AccountsService
         /// From DDD point of view this functionality may be considered as a part from User/UserAdministraion Domain. 
         /// It depends from bussiness logic.For now I will leave it here
         /// </summary>
-        public async Task CreateAccountAsync(User user, string username, string accountNumber, decimal initialBalance)
+        public async Task CreateAccountAsync(User user, string accountname, string accountNumber, decimal initialBalance)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user), "User cannot be null.");
 
             await _userAdministration.AddUserAsync(user);
 
-            var acccount = new Account(username, accountNumber, initialBalance);
+
+            var acccount =  Account.CreateNewAccount(name: accountname, accountNumber: accountNumber, balance: initialBalance);
+
+
             if (!_accounts.TryAdd(accountNumber, acccount))
                 throw new InvalidOperationException("Account number already exists!!");
 
