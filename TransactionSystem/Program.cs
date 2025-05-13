@@ -14,7 +14,7 @@ class Program
 
         while (true)
         {
-            Console.WriteLine("\n1) Create  2) Deposit  3) Withdraw  4) Balance  5) Transfer  6) Exit");
+            Console.WriteLine("\n0) Create User  1) Create  2) Deposit  3) Withdraw  4) Balance  5) Transfer  6) Exit");
 
             var opreartion = Console.ReadLine();
 
@@ -22,10 +22,17 @@ class Program
             {
                 switch (opreartion)
                 {
-                    case "1"://Create
+                    case "0"://Create User
+                        Console.Write("User Name: ");
+                        var name = Console.ReadLine();
+                        user = new User(name);
+                        Console.WriteLine($"User {name} created.");
+                        break;
+
+                    case "1"://Create Account
                         Console.Write("Set Name: ");
                         var accountname = Console.ReadLine();
-                        Console.Write("Account #: ");
+                        Console.Write("AccountId #: ");
                         var no = Console.ReadLine();
                         Console.Write("Set Balance: ");
                         Console.WriteLine("Balance is required!!!");
