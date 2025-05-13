@@ -1,52 +1,55 @@
-﻿
+﻿using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using TransactionSystem.DomainLogic.UserAdministration;
 using TransactionSystem.Entityes;
 
 namespace TransactionSystem.DomainLogic.AccountsService
 {
+    /// <summary>
+    /// The same is with the AccountService. I decided to have a service/repo for the account For future 
+    /// </summary>
     internal class AccountService : IAccountRepo
     {
-
         private readonly IUserAdministrationRepo _userAdministration;
-        private readonly ConcurrentDictionary<string, Account> _accounts = new(); //instead Accounts Table
+        private readonly ConcurrentDictionary<string, Account> _accounts = new(); // instead of Accounts Table
 
         public AccountService(IUserAdministrationRepo userAdministration)
         {
             _userAdministration = userAdministration;
         }
+
         /// <summary>
-        /// From DDD point of view this functionality may be considered as a part from User/UserAdministraion Domain. 
-        /// It depends from bussiness logic.For now I will leave it here
+        /// From DDD point of view this functionality may be considered as a part of User/UserAdministration Domain. 
+        /// It depends on business logic. For now I will leave it here.
         /// </summary>
-        public async Task CreateAccountAsync(User user, string accountname, string accountNumber, decimal initialBalance)
+        public async Task CreateAccountAsync(User user, string accountName, string accountNumber, decimal initialBalance)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user), "User cannot be null.");
 
             await _userAdministration.AddUserAsync(user);
 
+            var account = Account.CreateNewAccount(name: accountName, accountNumber: accountNumber, balance: initialBalance);
 
-            var acccount =  Account.CreateNewAccount(name: accountname, accountNumber: accountNumber, balance: initialBalance);
-
-
-            if (!_accounts.TryAdd(accountNumber, acccount))
+            if (!_accounts.TryAdd(accountNumber, account))
                 throw new InvalidOperationException("Account number already exists!!");
 
-            user.AddAccount(acccount);
+            user.AddAccount(account);
         }
 
-        public Account GetAccount(string accountNumber)
+        public Task<Account> GetAccountAsync(string accountNumber)
         {
+            if (_accounts.TryGetValue(accountNumber, out var account))
+                return Task.FromResult(account);
 
-            if (_accounts.TryGetValue(accountNumber, out var acct))
-                return acct;
             throw new InvalidOperationException("Account not found.");
         }
 
-        public decimal GetBalance(string accountNumber)
+        public async Task<decimal> GetBalanceAsync(string accountNumber)
         {
-            return GetAccount(accountNumber).GetBalance();
+            var account = await GetAccountAsync(accountNumber);
+            return account.GetBalance();
         }
     }
 }

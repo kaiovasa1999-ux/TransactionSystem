@@ -17,15 +17,15 @@ namespace System.Test
 
         [Fact]
 
-        public void Transfer_To_Same_Account_ThrowsInvalidOperationException()
+        public async Task Transfer_To_Same_Account_ThrowsInvalidOperationException()
         {
-            // Arrange
+            //Arrange
             var accountNumber = "123456789";
             // act & assert
-            var ex = Assert.Throws<InvalidOperationException>(
-                () => _transferService.Transfer(accountNumber, accountNumber, 100));
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+                async () => await _transferService.TransferAsync(accountNumber, accountNumber, 100));
 
-            Assert.Equal("Cannot transfer to the same account.", ex.Message); 
+            Assert.Equal("Cannot transfer to the same account.", ex.Message);
         }
     }
 }

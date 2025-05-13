@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TransactionSystem.DomainLogic.AccountsService;
 
 namespace TransactionSystem.DomainLogic.Transaction
@@ -6,41 +8,52 @@ namespace TransactionSystem.DomainLogic.Transaction
     public class TransactionService : ITransactionRepo
     {
         private readonly IAccountRepo _accountService;
+        private static readonly SemaphoreSlim _semaphore = new(1, 1);
+
         public TransactionService(IAccountRepo accountService)
         {
             _accountService = accountService;
         }
-        public void Deposit(string accountNumber, decimal amount)
+
+        public async Task DepositAsync(string accountNumber, decimal amount)
         {
-            var acccount = _accountService.GetAccount(accountNumber);
-            acccount.Deposit(amount);
+            var account = await _accountService.GetAccountAsync(accountNumber);
+            account.Deposit(amount);
         }
 
-        public void Withdraw(string accountNumber, decimal amount)
+        public async Task WithdrawAsync(string accountNumber, decimal amount)
         {
-            var acccount = _accountService.GetAccount(accountNumber);
-            acccount.Withdraw(amount);
+            var account = await _accountService.GetAccountAsync(accountNumber);
+            account.Withdraw(amount);
         }
 
-        public void Transfer(string fromAccount, string toAccount, decimal amount)
+        public async Task TransferAsync(string fromAccount, string toAccount, decimal amount)
         {
             if (fromAccount == toAccount)
                 throw new InvalidOperationException("Cannot transfer to the same account.");
 
-            var sender = _accountService.GetAccount(fromAccount);
-            var recievert = _accountService.GetAccount(toAccount);
+            var sender = await _accountService.GetAccountAsync(fromAccount);
+            var receiver = await _accountService.GetAccountAsync(toAccount);
 
-            // lock both accounts in a consistent order to avoid deadlocks (not waithing each othere to do the givven operation)
-            var locks = new[] { sender, recievert };
+            var locks = new[] { sender, receiver };
             Array.Sort(locks, (a, b) => string.Compare(a.AccountNumber, b.AccountNumber, StringComparison.Ordinal));
 
-            lock (locks[0])
+            // Using SemaphoreSlim to support async locking
+            await _semaphore.WaitAsync();
+            try
             {
-                lock (locks[1])
+                lock (locks[0])
                 {
-                    sender.Withdraw(amount);
-                    recievert.Deposit(amount);
+                    lock (locks[1])
+                    {
+                        sender.Withdraw(amount);
+                        receiver.Deposit(amount);
+                    }
                 }
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
     }

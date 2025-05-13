@@ -46,20 +46,20 @@ class Program
                         Console.Write("Amount: ");
                         if(no == null)
                             throw new ArgumentNullException("Account number cannot be null.");
-                        svc.Deposit(no, decimal.Parse(Console.ReadLine()));
-                        Console.WriteLine($"New Balance: {accountService.GetBalance(no):C}");
+                        svc.DepositAsync(no, decimal.Parse(Console.ReadLine()));
+                        Console.WriteLine($"New Balance: {accountService.GetBalanceAsync(no)}");
                         break;
                     case "3"://Withdraw
                         Console.Write("Acct #: ");
                         no = Console.ReadLine();
                         Console.Write("Amount: ");
-                        svc.Withdraw(no, decimal.Parse(Console.ReadLine()));
-                        Console.WriteLine($"New Balance: {accountService.GetBalance(no):C}");
+                        svc.WithdrawAsync(no, decimal.Parse(Console.ReadLine()));
+                        Console.WriteLine($"New Balance: {accountService.GetBalanceAsync(no)}");
                         break;
                     case "4"://Balance
                         Console.Write("Acct #: ");
                         no = Console.ReadLine();
-                        Console.WriteLine($"Balance: {accountService.GetBalance(no):C}");
+                        Console.WriteLine($"Balance: {accountService.GetBalanceAsync(no)}");
                         break;
                     case "5"://Transfer
                         Console.Write("From Acct #: ");
@@ -68,9 +68,9 @@ class Program
                         var to = Console.ReadLine();
                         Console.Write("Amount: ");
                         var amt = decimal.Parse(Console.ReadLine());
-                        svc.Transfer(from, to, amt);
-                        Console.WriteLine($"From New Balance: {accountService.GetBalance(from):C}");
-                        Console.WriteLine($"To New Balance: {accountService.GetBalance(to):C}");
+                        svc.TransferAsync(from, to, amt);
+                        Console.WriteLine($"From New Balance: {accountService.GetBalanceAsync(from)}");
+                        Console.WriteLine($"To New Balance: {accountService.GetBalanceAsync(to)}");
                         break;
                     case "6"://Exit
                         Console.WriteLine("Exiting... the best system that you can have :)! Are you sure?");

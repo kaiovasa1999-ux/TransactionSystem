@@ -4,6 +4,9 @@ namespace TransactionSystem.Test
 {
     public class AccountStateTests
     {
+        /// <summary>
+        /// This test are validating the end state of the account. 
+        /// </summary>
         [Fact]
         public void NewAccount_HasInitialBalance()
         {

@@ -6,8 +6,8 @@ namespace TransactionSystem.DomainLogic.AccountsService
     {
         Task CreateAccountAsync(User user, string username, string accountNumber, decimal initialBalance);
 
-        decimal GetBalance(string accountNumber);
+        Task<decimal> GetBalanceAsync(string accountNumber);
 
-        Account GetAccount(string accountNumber);
+        Task<Account> GetAccountAsync(string accountNumber);
     }
 }
