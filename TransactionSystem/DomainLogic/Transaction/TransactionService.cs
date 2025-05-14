@@ -8,7 +8,7 @@ namespace TransactionSystem.DomainLogic.Transaction
     public class TransactionService : ITransactionRepo
     {
         private readonly IAccountRepo _accountService;
-        private static readonly SemaphoreSlim _semaphore = new(1, 1);
+        //private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
         public TransactionService(IAccountRepo accountService)
         {
@@ -38,11 +38,15 @@ namespace TransactionSystem.DomainLogic.Transaction
             var locks = new[] { sender, receiver };
             Array.Sort(locks, (a, b) => string.Compare(a.AccountNumber, b.AccountNumber, StringComparison.Ordinal));
 
-            // Using SemaphoreSlim to support async locking
-            await _semaphore.WaitAsync();
-            try
-            {
-                lock (locks[0])
+            
+            // Using SemaphoreSlim to support async locking.
+            // Just to show you that you can use it as a variant if you want to.
+
+
+            //await _semaphore.WaitAsync();
+            //try
+            //{
+            lock (locks[0])
                 {
                     lock (locks[1])
                     {
@@ -50,11 +54,11 @@ namespace TransactionSystem.DomainLogic.Transaction
                         receiver.Deposit(amount);
                     }
                 }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            //}
+            //finally
+            //{
+            //    _semaphore.Release();
+            //}
         }
     }
 }
